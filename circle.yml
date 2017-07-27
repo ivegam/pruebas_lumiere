@@ -27,7 +27,7 @@ dependencies:
   cache_directories:
     - ~/.kube
   pre:
-    - make get-deployment-scripts
+#    - make get-deployment-scripts
     - ./deployment/ensure-kubernetes-is-installed.sh
 
 test:
