@@ -1,0 +1,53 @@
+server:
+  context-path: /
+  port: 8080
+
+spring:
+  application:
+    name: operator-api
+  jpa:
+    database: h2
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    platform: h2
+    url: jdbc:h2:mem:AZ;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    driverClassName: org.h2.Driver
+  output:
+    ansi:
+      enabled: DETECT
+      
+logging:
+     level:
+        root: INFO
+        org.springframework.web: INFO
+        org.hibernate: INFO
+        com.yoigo: INFO
+
+ribbon:
+  ServerListRefreshInterval: 1000
+
+endpoints:
+  enabled: false
+  health:
+    enabled: true
+    sensitive: false
+  cors:
+    allowed-origins: "*"
+    allowed-methods: "*"
+    allowed-headers: "*"
+    
+operator:
+    endpoint: http://212.166.71.119:804/api/operador/1/operator-mobile
+    path: /{phoneNumber}
+    
+flyway:
+  enabled: true
+  locations: db/test/migrations
+  url: jdbc:h2:mem:AZ
+  user: sa
+  table: operator_api_schema_version
+  baselineOnMigrate: true
+  encoding: UTF-8

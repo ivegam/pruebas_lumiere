@@ -1,0 +1,55 @@
+server:
+  context-path: /
+  port: 8080
+
+spring:
+  application:
+    name: operator-api
+  jpa:
+    database: POSTGRESQL
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+  datasource:
+    platform: postgres
+    url: ${db.url}
+    username: ${db.username}
+    password: ${db.password}
+    driverClassName: org.postgresql.Driver
+  output:
+    ansi:
+      enabled: DETECT
+    
+logging:
+     level:
+        root: INFO
+        org.springframework.web: INFO
+        org.hibernate: INFO
+        com.yoigo: INFO
+
+ribbon:
+  ServerListRefreshInterval: 1000
+
+endpoints:
+  enabled: false
+  health:
+    enabled: true
+    sensitive: false
+  cors:
+    allowed-origins: "*"
+    allowed-methods: "*"
+    allowed-headers: "*"
+
+operator:
+   endpoint: http://212.166.71.119:801/api/operador/1/operator-mobile
+   path: /{phoneNumber}
+   
+flyway:
+  enabled: true
+  locations: db/migrations
+  url: ${db.url}
+  user: ${db.username}
+  password: ${db.password}
+  table: operator_api_schema_version
+  baselineOnMigrate: true
+  encoding: UTF-8

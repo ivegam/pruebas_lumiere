@@ -1,0 +1,124 @@
+/************************************ Operator API ******************************************/
+
+
+/************************************ Build Script ******************************************/
+buildscript {
+	ext {
+		springBootVersion = '1.5.2.RELEASE'
+		flywayVersion = '4.0.3'
+    h2Version = '1.4.182'
+	}
+	repositories {
+        jcenter()
+		mavenCentral()
+		maven {
+          url "https://plugins.gradle.org/m2/"
+        }
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("gradle.plugin.com.boxfuse.client:flyway-release:${flywayVersion}")
+        classpath("com.h2database:h2:${h2Version}")
+	}
+}
+/********************************************************************************************/
+
+
+
+/************************************* Plugins **********************************************/
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+/********************************************************************************************/
+
+
+
+/*********************************** Environments *******************************************/
+configurations {
+    dev
+    prod
+}
+/********************************************************************************************/
+
+
+
+/************************************ Project Prop ******************************************/
+version = '0.0.1-SNAPSHOT'
+group = 'yoigo'
+sourceCompatibility = 1.8
+/********************************************************************************************/
+
+
+
+/************************************ Default Tasks *****************************************/
+
+tasks.withType(JavaCompile) {
+  options.encoding = "utf-8"
+}
+        
+tasks.withType(Test) {
+	systemProperty "spring.profiles.active", "test"
+    systemProperty "file.encoding", "utf-8"
+}
+
+bootRun {
+    // Use Spring Boot DevTool only when we run Gradle bootRun task
+    classpath = sourceSets.main.runtimeClasspath + configurations.dev
+}
+
+/********************************************************************************************/
+
+
+
+/************************************ Dependencies *******************************************/
+
+ext {
+		springBootVersion = '1.5.2.RELEASE'
+		postgresqlVersion = '42.0.0'
+		swaggerAnnotationsVersion = '1.5.13'
+		springfoxSwaggerUi = '2.6.1'
+		springfoxSwagger2 = '2.6.1'
+}
+
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile(
+	 [group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBootVersion}"],
+     [group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: "${springBootVersion}"],
+     [group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: "${springBootVersion}"],
+     [group: 'io.swagger', name: 'swagger-annotations', version: "${swaggerAnnotationsVersion}"],
+     [group: 'io.springfox', name: 'springfox-swagger2', version: "${springfoxSwagger2}"],
+     [group: 'io.springfox', name: 'springfox-swagger-ui', version: "${springfoxSwaggerUi}"],
+     [group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: "${springBootVersion}"]     
+	)
+	runtime(
+	 [group: 'org.postgresql', name: 'postgresql', version: "${postgresqlVersion}"],
+	 [group: 'com.h2database', name: 'h2', version: "${h2Version}"],
+	 [group: 'org.flywaydb', name: 'flyway-core']
+	)
+	dev(
+	 [group: 'org.springframework.boot', name: 'spring-boot-devtools', version: "${springBootVersion}"],
+	)
+	testCompile(
+	 [group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: "${springBootVersion}"]
+	)
+
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Dalston.RELEASE"
+	}
+}
+
+/********************************************************************************************/
+
+
+/************************************ Custom Tasks ******************************************/
+
+
+/********************************************************************************************/

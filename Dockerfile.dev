@@ -1,0 +1,14 @@
+FROM openjdk:8-jdk-alpine
+
+RUN mkdir -p /root/.gradle
+ENV HOME /root
+VOLUME /root/.gradle
+
+RUN mkdir /app
+COPY . /app
+VOLUME /app
+
+EXPOSE 8080
+ENV GRADLE_OPTS -Dorg.gradle.native=false
+WORKDIR /app
+CMD ["./gradlew", "bootRun", "--no-daemon"]

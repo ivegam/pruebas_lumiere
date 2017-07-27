@@ -1,0 +1,17 @@
+# docker-compose API version
+version: '3'
+services:
+  example-api:
+    container_name: operator-api-container
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - 8080:8080 # <HOST-PORT>:<CONTAINER-PORT>
+      - 35729:35729 # for remote connections
+    volumes:
+      - /root/.gradle # persist gradle cache in a data volume so we don't need to re-install it on every `docker build`
+      - .:/app # needed for hot-restarting
+    environment:
+     # Set Spring boot environment
+     - SPRING_PROFILES_ACTIVE=dev

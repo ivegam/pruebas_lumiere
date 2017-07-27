@@ -1,0 +1,6 @@
+FROM openjdk:8-jdk-alpine
+COPY /build/libs/operator-api-*.jar app.jar
+RUN sh -c 'touch /app.jar'
+ENV SPRING_PROFILES_ACTIVE=prod
+#ENV JAVA_OPTS="-Xdebug -Xrunjdwp:server=y,transport=dt_socket,suspend=n"
+ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -jar /app.jar" ]

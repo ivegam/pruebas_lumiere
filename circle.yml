@@ -1,0 +1,59 @@
+# IMPORTANT PREREQUISITES
+#
+# • "CircleCI" user needs to be created on AWS with the following policies attached:
+#   - AmazonEC2ContainerRegistryPowerUser
+#   - AmazonS3ReadOnlyAccess
+#
+# • Following environment variables need to be set on CircleCI
+#   - DOCKER_REGISTRY_URL
+#   - KUBERNETES_CONFIG_PASSWORD_DEV
+#   - KUBERNETES_CONFIG_PASSWORD_CANARY
+#   - KUBERNETES_CONFIG_PASSWORD_PROD
+#   - AWS_ACCESS_KEY_ID
+#   - AWS_SECRET_ACCESS_KEY
+#
+# • Kubernetes cluster needs to have been created
+# • ~/.kube/config needs to have been put into a S3 bucket (KUBERNETES_CONFIG_STORE_<cluster-name>)
+
+machine:
+  services:
+    - docker
+
+  environment:
+    KUBERNETES_SERVICE_NAME: thor-operator-api
+    SPRING_PROFILES_ACTIVE: test
+
+dependencies:
+  cache_directories:
+    - ~/.kube
+  pre:
+    - make get-deployment-scripts
+    - ./deployment/ensure-kubernetes-is-installed.sh
+
+test:
+  override:
+    - ./gradlew build
+
+deployment:
+  dev:
+    branch: master
+    commands:
+      # build docker production image
+      # --rm=false avoids this warning: https://circleci.com/docs/1.0/docker-btrfs-error/
+      - make ARGS="--rm=false" build-prod-image
+
+      # push docker image to private docker registry on AWS ECR
+      - ./deployment/push-docker-image-to-aws-ecr.sh
+
+      # update kubernetes deployment with new image
+      - ./deployment/deploy.sh dev
+
+  canary:
+    tag: /v[0-9]+(\.[0-9]+)*-rc\.[0-9]/
+    commands:
+      - ./deployment/deploy.sh canary
+
+  production:
+    tag: /v[0-9]+(\.[0-9]+)*/
+    commands:
+      - ./deployment/deploy.sh prod
